@@ -36,12 +36,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               .toList();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 12, 8, 0),
+                padding: EdgeInsets.fromLTRB(16, 10, 8, 0),
                 child: BrandHeader(),
               ),
             ),
@@ -51,22 +52,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextField(
-                      onChanged: (value) => setState(() => _query = value),
-                      onSubmitted: (_) => context.go(AppRoutes.catalog),
-                      decoration: const InputDecoration(
-                        hintText: 'Search',
-                        prefixIcon: Icon(Icons.menu),
-                        suffixIcon: Icon(Icons.mic_none),
-                        isDense: true,
-                      ),
+                    Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(right: 8),
+                          child: Icon(Icons.menu, size: 20),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            onChanged: (value) =>
+                                setState(() => _query = value),
+                            onSubmitted: (_) => context.go(AppRoutes.catalog),
+                            decoration: const InputDecoration(
+                              hintText: 'Search',
+                              prefixIcon: Icon(Icons.search, size: 18),
+                              suffixIcon: Icon(Icons.person_outline, size: 18),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     if (suggestions.isNotEmpty)
                       Container(
-                        margin: const EdgeInsets.only(top: 2),
+                        margin: const EdgeInsets.only(left: 28, top: 2),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                           border: Border.all(color: AppColors.border),
                           boxShadow: const [
                             BoxShadow(
@@ -95,44 +107,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     const SizedBox(height: 12),
                     Container(
-                      height: 122,
+                      height: 128,
                       width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(16, 14, 14, 10),
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xffd898da), Color(0xfff7a37d)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [Color(0xffe9a8df), Color(0xffffc35a)],
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
                         children: [
-                          Text(
-                            MockCatalog.banner.title,
-                            style: const TextStyle(
-                              fontSize: 23,
-                              color: Color(0xff4e4dc0),
-                              fontWeight: FontWeight.w900,
+                          Positioned(
+                            right: -18,
+                            top: -38,
+                            child: Container(
+                              width: 150,
+                              height: 150,
+                              decoration: const BoxDecoration(
+                                color: Color(0x33FFFFFF),
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
-                          Text(
-                            MockCatalog.banner.subtitle,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 14, 120, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  MockCatalog.banner.title,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    color: Color(0xff5144bd),
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  MockCatalog.banner.subtitle,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                const Spacer(),
+                                SizedBox(
+                                  height: 28,
+                                  child: OutlinedButton(
+                                    onPressed: () =>
+                                        context.go(AppRoutes.catalog),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      foregroundColor: Colors.white,
+                                      side: const BorderSide(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      MockCatalog.banner.cta,
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const Spacer(),
-                          OutlinedButton(
-                            onPressed: () => context.go(AppRoutes.catalog),
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: const Size(78, 26),
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white),
-                            ),
-                            child: Text(
-                              MockCatalog.banner.cta,
-                              style: const TextStyle(fontSize: 10),
+                          const Positioned(
+                            right: 18,
+                            bottom: 12,
+                            child: Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 76,
+                              color: Color(0xCCFFFFFF),
                             ),
                           ),
                         ],
@@ -185,7 +235,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 }, childCount: categories.length),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 5,
-                  childAspectRatio: 0.72,
+                  childAspectRatio: 0.78,
                   mainAxisSpacing: 8,
                 ),
               ),

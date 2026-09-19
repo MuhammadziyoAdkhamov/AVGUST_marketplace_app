@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/constants/app_constants.dart';
+import '../../../../app/theme/app_colors.dart';
 import '../../../../shared/models/product.dart';
 import '../../../favorites/presentation/providers/favorites_provider.dart';
 
@@ -18,13 +19,13 @@ class ProductCard extends ConsumerWidget {
 
     return InkWell(
       onTap: () => context.go(AppRoutes.product(product.id)),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(10),
       child: SizedBox.expand(
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE1E1E1)),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.border),
           ),
           child: Stack(
             children: [
@@ -38,7 +39,7 @@ class ProductCard extends ConsumerWidget {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: preview.$1,
-                          borderRadius: BorderRadius.circular(5),
+                          borderRadius: BorderRadius.circular(7),
                         ),
                         child: Icon(preview.$2, size: 48, color: preview.$3),
                       ),
@@ -76,7 +77,7 @@ class ProductCard extends ConsumerWidget {
                             const Icon(
                               Icons.star,
                               size: 10,
-                              color: Color(0xFFFFB400),
+                              color: AppColors.star,
                             ),
                             Text(
                               product.rating.toStringAsFixed(1),
@@ -98,7 +99,7 @@ class ProductCard extends ConsumerWidget {
                   icon: Icon(
                     liked ? Icons.favorite : Icons.favorite_border,
                     size: 16,
-                    color: liked ? Colors.red : const Color(0xFF424242),
+                    color: liked ? Colors.red : AppColors.muted,
                   ),
                   onPressed: () =>
                       ref.read(favoritesProvider.notifier).toggle(product.id),

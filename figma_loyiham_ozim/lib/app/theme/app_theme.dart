@@ -7,15 +7,15 @@ class AppTheme {
   static ThemeData get light => ThemeData(
     useMaterial3: true,
     colorSchemeSeed: AppColors.brand,
-    scaffoldBackgroundColor: const Color(0xFFFDFBFF),
+    scaffoldBackgroundColor: Colors.white,
     navigationBarTheme: const NavigationBarThemeData(
       height: 62,
-      indicatorColor: Color(0x1F8B5CF6),
+      indicatorColor: Color(0x2442E86A),
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       labelTextStyle: WidgetStatePropertyAll(TextStyle(fontSize: 10)),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFFDFBFF),
+      backgroundColor: Colors.white,
       foregroundColor: AppColors.text,
       elevation: 0,
       scrolledUnderElevation: 0,
@@ -41,7 +41,7 @@ class AppTheme {
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: AppColors.brandButton,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         minimumSize: const Size.fromHeight(48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
