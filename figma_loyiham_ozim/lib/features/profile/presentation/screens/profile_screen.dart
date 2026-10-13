@@ -29,7 +29,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           children: [
             Row(
               children: [
-                const CircleAvatar(radius: 42, child: Icon(Icons.person, size: 45)),
+                const CircleAvatar(
+                  radius: 42,
+                  child: Icon(Icons.person, size: 45),
+                ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -74,7 +77,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Joriy rejim', style: TextStyle(fontSize: 11)),
+                        const Text(
+                          'Joriy rejim',
+                          style: TextStyle(fontSize: 11),
+                        ),
                         Text(
                           seller ? 'Sotuvchi' : 'Xaridor',
                           style: const TextStyle(
@@ -89,7 +95,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     onPressed: () => setState(() => panel = !panel),
                     child: const Text(
                       "O'zgartirish",
-                      style: TextStyle(color: AppColors.brand),
+                      style: TextStyle(color: AppColors.brandDark),
                     ),
                   ),
                 ],
@@ -205,9 +211,7 @@ class _Panel extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
           ),
           const SizedBox(height: 7),
-          const Text(
-            'Kerakli rejimni tanlab platformadan\nqulay foydalaning',
-          ),
+          const Text('Kerakli rejimni tanlab platformadan\nqulay foydalaning'),
           const SizedBox(height: 15),
           _Choice(
             'Xaridor rejimi',
@@ -217,7 +221,7 @@ class _Panel extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _Choice(
-            "So'tuvchi rejimi",
+            "Sotuvchi rejimi",
             "Do'kon boshqarish, mahsulot\njoylash va sotish",
             seller,
             onSeller,

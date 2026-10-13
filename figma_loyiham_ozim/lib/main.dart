@@ -35,9 +35,11 @@ class AugustApp extends ConsumerWidget {
       routerConfig: router,
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.linear(1)),
+          data: MediaQuery.of(context).copyWith(
+            textScaler: MediaQuery.textScalerOf(
+              context,
+            ).clamp(minScaleFactor: 1, maxScaleFactor: 1.3),
+          ),
           child: child ?? const SizedBox.shrink(),
         );
       },

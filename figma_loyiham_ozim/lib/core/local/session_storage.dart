@@ -22,7 +22,18 @@ class SessionStorage {
   AppUser? readUser() {
     final raw = _prefs.getString(_userKey);
     if (raw == null) return null;
-    return AppUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    try {
+      return AppUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } on FormatException {
+      _prefs.remove(_userKey);
+      return null;
+    } on TypeError {
+      _prefs.remove(_userKey);
+      return null;
+    } on ArgumentError {
+      _prefs.remove(_userKey);
+      return null;
+    }
   }
 
   Future<void> saveUser(AppUser user) {

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/constants/app_constants.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../shared/data/mock_catalog.dart';
+import '../../../cart/presentation/providers/cart_provider.dart';
 
-class ProductVideoScreen extends StatelessWidget {
+class ProductVideoScreen extends ConsumerWidget {
   const ProductVideoScreen({super.key, required this.productId});
 
   final String productId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final product = MockCatalog.byId(productId);
     return Scaffold(
       backgroundColor: Colors.black,
@@ -24,7 +24,22 @@ class ProductVideoScreen extends StatelessWidget {
         children: [
           const Expanded(
             child: Center(
-              child: Icon(Icons.play_circle, color: Colors.white54, size: 72),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.videocam_off_outlined,
+                    color: Colors.white54,
+                    size: 64,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Bu mahsulot uchun video hali qo‘shilmagan',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(
@@ -32,7 +47,18 @@ class ProductVideoScreen extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: () => context.go(AppRoutes.product(productId)),
+                onPressed: product == null
+                    ? null
+                    : () {
+                        ref.read(cartProvider.notifier).add(product);
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            const SnackBar(
+                              content: Text("Savatchaga qo'shildi"),
+                            ),
+                          );
+                      },
                 icon: const Icon(Icons.shopping_cart_outlined),
                 label: const Text("Savatchaga qo'shish"),
                 style: FilledButton.styleFrom(

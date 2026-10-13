@@ -24,8 +24,13 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<Result<void>> login({
     required String identifier,
     required String password,
+    bool remember = true,
   }) async {
-    if (identifier.trim().isEmpty || password.length < 8) {
+    final value = identifier.trim();
+    final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value);
+    final phoneDigits = value.replaceAll(RegExp(r'\D'), '');
+    final validPhone = phoneDigits.length >= 9 && phoneDigits.length <= 15;
+    if ((!validEmail && !validPhone) || password.length < 8) {
       return const Err(
         ValidationFailure('Telefon/email va parolni tekshiring'),
       );
@@ -35,27 +40,43 @@ class AuthNotifier extends Notifier<AuthState> {
         existing ??
         AppUser(
           id: 'u1',
-          name: 'Mark Zuckerberg',
-          phone: identifier.contains('@') ? '+998 88 135 31 30' : identifier,
-          email: identifier.contains('@') ? identifier : 'zucke.net',
+          name: 'Avgust xaridori',
+          phone: validEmail ? '' : value,
+          email: validEmail ? value : null,
           role: UserRole.buyer,
         );
-    await ref.read(sessionStorageProvider).saveUser(user);
+    if (remember) {
+      await ref.read(sessionStorageProvider).saveUser(user);
+    } else {
+      await ref.read(sessionStorageProvider).clear();
+    }
     state = AuthState(user: user);
     return const Ok(null);
   }
 
   Future<Result<void>> register({
-    required String phone,
+    required String identifier,
+    required bool isEmail,
     required String password,
   }) async {
-    if (phone.trim().isEmpty || password.length < 8) {
+    final value = identifier.trim();
+    final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value);
+    final phoneDigits = value.replaceAll(RegExp(r'\D'), '');
+    final validPhone = phoneDigits.length >= 9 && phoneDigits.length <= 15;
+    final validIdentifier = isEmail ? validEmail : validPhone;
+    final strongPassword =
+        password.length >= 8 &&
+        RegExp(r'[A-Z]').hasMatch(password) &&
+        RegExp(r'[0-9]').hasMatch(password) &&
+        RegExp(r'[^A-Za-z0-9]').hasMatch(password);
+    if (!validIdentifier || !strongPassword) {
       return const Err(ValidationFailure("Ma'lumotlar to'liq emas"));
     }
     final user = AppUser(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: 'Yangi foydalanuvchi',
-      phone: phone,
+      phone: isEmail ? '' : value,
+      email: isEmail ? value : null,
       role: UserRole.buyer,
     );
     await ref.read(sessionStorageProvider).saveUser(user);

@@ -22,67 +22,84 @@ class _RoleSelectionScreenState extends ConsumerState<RoleSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(26, 48, 26, 34),
-              child: Column(
-                children: [
-                  const Text(
-                    'Siz nima qilishni\nhohlaysiz ?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      height: 1.45,
+        child: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(22, 72, 22, 24),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Siz nima qilishni\nxohlaysiz?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w800,
+                        height: 1.45,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "O'zingizga mos rolni tanlang",
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 48),
-                  _RoleCard(
-                    icon: Icons.shopping_bag_outlined,
-                    title: 'Xarid qilish',
-                    subtitle:
-                        'Mahsulotni qidirish\nbuyurtma berish\nva harid qilish',
-                    selected: _selected == UserRole.buyer,
-                    onTap: () => setState(() => _selected = UserRole.buyer),
-                  ),
-                  const SizedBox(height: 12),
-                  _RoleCard(
-                    icon: Icons.storefront_outlined,
-                    title: 'Mahsulot sotish',
-                    subtitle: "Do'kon ochish mahsulot\njoylash va sotish",
-                    selected: _selected == UserRole.seller,
-                    onTap: () => setState(() => _selected = UserRole.seller),
-                  ),
-                  const SizedBox(height: 12),
-                  _RoleCard(
-                    icon: Icons.sync_alt,
-                    title: 'Mahsulot va Xarid',
-                    subtitle: 'Mahsulot sotish va\nXarid qilish ham',
-                    selected: _selected == UserRole.both,
-                    onTap: () => setState(() => _selected = UserRole.both),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: FilledButton(
-                      onPressed: () async {
-                        await ref
-                            .read(authProvider.notifier)
-                            .setRole(_selected);
-                        if (context.mounted) context.go(AppRoutes.home);
-                      },
-                      child: const Text('Davom etish'),
+                    const SizedBox(height: 20),
+                    Text(
+                      "O'zingizga mos rolni tanlang",
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 38),
+                    _RoleCard(
+                      icon: Image.asset(
+                        'assets/images/role_screen/buy.png',
+                        width: 54,
+                        height: 54,
+                        fit: BoxFit.contain,
+                      ),
+                      title: 'Xarid qilish',
+                      subtitle:
+                          'Mahsulotni qidirish, buyurtma berish\nva xarid qilish',
+                      selected: _selected == UserRole.buyer,
+                      onTap: () => setState(() => _selected = UserRole.buyer),
+                    ),
+                    const SizedBox(height: 12),
+                    _RoleCard(
+                      icon: Image.asset(
+                        'assets/images/role_screen/sell.png',
+                        width: 54,
+                        height: 54,
+                        fit: BoxFit.contain,
+                      ),
+                      title: 'Mahsulot sotish',
+                      subtitle: "Do'kon ochish mahsulot\njoylash va sotish",
+                      selected: _selected == UserRole.seller,
+                      onTap: () => setState(() => _selected = UserRole.seller),
+                    ),
+                    const SizedBox(height: 12),
+                    _RoleCard(
+                      icon: Image.asset(
+                        'assets/images/role_screen/buy_and_sell.png',
+                        width: 54,
+                        height: 54,
+                        fit: BoxFit.contain,
+                      ),
+                      title: 'Mahsulot va Xarid',
+                      subtitle: 'Mahsulot sotish va\nXarid qilish ham',
+                      selected: _selected == UserRole.both,
+                      onTap: () => setState(() => _selected = UserRole.both),
+                    ),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: FilledButton(
+                        onPressed: () async {
+                          await ref
+                              .read(authProvider.notifier)
+                              .setRole(_selected);
+                          if (context.mounted) context.go(AppRoutes.home);
+                        },
+                        child: const Text('Davom etish'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -100,7 +117,7 @@ class _RoleCard extends StatelessWidget {
     required this.selected,
     required this.onTap,
   });
-  final IconData icon;
+  final Widget icon;
   final String title;
   final String subtitle;
   final bool selected;
@@ -112,8 +129,8 @@ class _RoleCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        height: 112,
-        padding: const EdgeInsets.symmetric(horizontal: 22),
+        height: 90,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: selected ? AppColors.brandSoft : Colors.white,
           border: Border.all(color: AppColors.border),
@@ -121,8 +138,8 @@ class _RoleCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 55),
-            const SizedBox(width: 28),
+            SizedBox(width: 64, height: 64, child: icon),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

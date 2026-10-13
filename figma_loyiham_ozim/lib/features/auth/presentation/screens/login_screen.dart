@@ -16,7 +16,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _phoneLogin = false;
-  bool _remember = false;
+  bool _remember = true;
+  bool _submitting = false;
   bool _hidden = true;
   final _id = TextEditingController();
   final _password = TextEditingController();
@@ -30,14 +31,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    final result = await ref
-        .read(authProvider.notifier)
-        .login(identifier: _id.text, password: _password.text);
-    if (result is Err && mounted) {
-      setState(() => _error = result.failure.message);
+    if (_submitting) return;
+    final identifier = _id.text.trim();
+    final emailValid = RegExp(
+      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+    ).hasMatch(identifier);
+    final phoneDigits = identifier.replaceAll(RegExp(r'\D'), '');
+    final identityValid = _phoneLogin
+        ? phoneDigits.length >= 9 && phoneDigits.length <= 15
+        : emailValid;
+    if (!identityValid) {
+      setState(
+        () => _error = _phoneLogin
+            ? 'Telefon raqamini to‘g‘ri kiriting'
+            : 'Email manzilini to‘g‘ri kiriting',
+      );
       return;
     }
-    if (mounted) context.go(AppRoutes.role);
+    if (_password.text.length < 8) {
+      setState(
+        () => _error = 'Parol kamida 8 ta belgidan iborat bo‘lishi kerak',
+      );
+      return;
+    }
+    setState(() {
+      _error = null;
+      _submitting = true;
+    });
+    final result = await ref
+        .read(authProvider.notifier)
+        .login(
+          identifier: identifier,
+          password: _password.text,
+          remember: _remember,
+        );
+    if (!mounted) return;
+    if (result is Err) {
+      setState(() {
+        _error = result.failure.message;
+        _submitting = false;
+      });
+      return;
+    }
+    context.go(AppRoutes.role);
   }
 
   @override
@@ -48,21 +84,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 420),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
+              padding: const EdgeInsets.fromLTRB(22, 72, 22, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 24),
+                  const Text(
+                    'avgust.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 42,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -2,
+                      color: AppColors.brandDark,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
                   const Text(
                     'Tizimga kirish',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 27, fontWeight: FontWeight.w800),
+                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Hisobingizga kiring va davom eting',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                   ),
                   const SizedBox(height: 38),
                   Row(
@@ -70,17 +116,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _LoginType(
                         text: 'Telefon',
                         active: _phoneLogin,
-                        onTap: () => setState(() => _phoneLogin = true),
+                        onTap: () => setState(() {
+                          _phoneLogin = true;
+                          _id.clear();
+                          _error = null;
+                        }),
                       ),
                       const SizedBox(width: 8),
                       _LoginType(
                         text: 'Email',
                         active: !_phoneLogin,
-                        onTap: () => setState(() => _phoneLogin = false),
+                        onTap: () => setState(() {
+                          _phoneLogin = false;
+                          _id.clear();
+                          _error = null;
+                        }),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 22),
                   Text(
                     _phoneLogin ? 'Telefon raqamingiz' : 'Email pochtangiz',
                     style: const TextStyle(fontWeight: FontWeight.w700),
@@ -91,8 +145,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     keyboardType: _phoneLogin
                         ? TextInputType.phone
                         : TextInputType.emailAddress,
+                    onChanged: (_) => setState(() => _error = null),
                     decoration: InputDecoration(
                       hintText: _phoneLogin ? '+998 90 123 45 67' : 'email',
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 22),
@@ -105,7 +165,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const Spacer(),
                       Flexible(
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () => ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Parolni tiklash serverga ulangach ishlaydi.',
+                                ),
+                              ),
+                            ),
                           child: const Text(
                             'Parolni unutdingizmi ?',
                             overflow: TextOverflow.ellipsis,
@@ -118,8 +186,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextField(
                     controller: _password,
                     obscureText: _hidden,
+                    onChanged: (_) => setState(() => _error = null),
                     decoration: InputDecoration(
                       hintText: 'Parolni kiriting',
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       suffixIcon: IconButton(
                         onPressed: () => setState(() => _hidden = !_hidden),
                         icon: Icon(
@@ -138,6 +212,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Checkbox(
                           value: _remember,
                           activeColor: AppColors.brandButton,
+                          visualDensity: VisualDensity.compact,
                           onChanged: (value) =>
                               setState(() => _remember = value ?? false),
                         ),
@@ -158,8 +233,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         backgroundColor: AppColors.loginBlue,
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: _submit,
-                      child: const Text('Kirish'),
+                      onPressed: _submitting ? null : _submit,
+                      child: _submitting
+                          ? const SizedBox.square(
+                              dimension: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Kirish'),
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -167,17 +247,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      const Text('Hisobingiz yoqmi? '),
+                      const Text('Hisobingiz yo‘qmi? '),
                       TextButton(
-                        onPressed: () => context.go(AppRoutes.register),
+                        onPressed: _submitting
+                            ? null
+                            : () => context.go(AppRoutes.register),
                         child: const Text(
-                          "Ro'yhatdan otish",
+                          "Ro‘yxatdan o‘tish",
                           style: TextStyle(color: AppColors.loginBlue),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: _submitting
+                        ? null
+                        : () async {
+                            await ref
+                                .read(authProvider.notifier)
+                                .login(
+                                  identifier: 'demo@avgust.local',
+                                  password: 'DemoOnly1!',
+                                  remember: false,
+                                );
+                            if (context.mounted) context.go(AppRoutes.home);
+                          },
+                    icon: const Icon(Icons.explore_outlined),
+                    label: const Text('Namoyishni ochish'),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Namoyish rejimi · Haqiqiy hisobga kirish va to‘lov uchun server ulanishi kerak.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 11, color: AppColors.muted),
+                  ),
                 ],
               ),
             ),

@@ -12,16 +12,14 @@ class FavoritesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(favoriteProductsProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Sevimlilar  ${items.length}'),
-      ),
+      appBar: AppBar(title: Text('Sevimlilar  ${items.length}')),
       body: items.isEmpty
           ? const EmptyView(message: "Sevimlilar hozircha bo'sh")
           : GridView.builder(
               padding: const EdgeInsets.all(12),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.65,
+                mainAxisExtent: 286,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
               ),

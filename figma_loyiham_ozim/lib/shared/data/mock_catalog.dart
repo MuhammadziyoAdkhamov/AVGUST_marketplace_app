@@ -12,10 +12,14 @@ class MockCatalog {
   );
 
   static const categories = <ShopCategory>[
-    ShopCategory(id: 'all', title: 'All', icon: Icons.apps),
+    ShopCategory(id: 'all', title: 'Barcha tovarlar', icon: Icons.apps),
     ShopCategory(id: 'men', title: 'Erkaklar', icon: Icons.checkroom_outlined),
     ShopCategory(id: 'women', title: 'Ayollar', icon: Icons.woman_outlined),
-    ShopCategory(id: 'beauty', title: "Go'zallik", icon: Icons.spa_outlined),
+    ShopCategory(
+      id: 'construction',
+      title: 'Qurilish mollari',
+      icon: Icons.handyman_outlined,
+    ),
     ShopCategory(
       id: 'accessories',
       title: 'Aksessuarlar',
@@ -31,19 +35,61 @@ class MockCatalog {
       title: 'Bolalar kiyimi',
       icon: Icons.child_care_outlined,
     ),
-    ShopCategory(id: 'sport', title: 'Sportlar', icon: Icons.sports_soccer_outlined),
+    ShopCategory(
+      id: 'watches',
+      title: 'Soatlar',
+      icon: Icons.watch_later_outlined,
+    ),
     ShopCategory(id: 'toys', title: "O'yinchoqlar", icon: Icons.toys_outlined),
+    ShopCategory(id: 'perfumes', title: 'Atirlar', icon: Icons.spa_outlined),
     ShopCategory(
       id: 'auto',
-      title: 'Avto ehtiyot',
+      title: 'Avto tovarlar',
       icon: Icons.directions_car_outlined,
     ),
+    ShopCategory(
+      id: 'stationery',
+      title: 'Kanselyariya',
+      icon: Icons.edit_note_outlined,
+    ),
+    ShopCategory(
+      id: 'food',
+      title: 'Oziq-ovqat',
+      icon: Icons.restaurant_outlined,
+    ),
+    ShopCategory(
+      id: 'sport',
+      title: 'Sport tovarlar',
+      icon: Icons.sports_soccer_outlined,
+    ),
+    ShopCategory(
+      id: 'music',
+      title: 'Musiqa asboblari',
+      icon: Icons.music_note_outlined,
+    ),
+    ShopCategory(id: 'furniture', title: 'Mebel', icon: Icons.weekend_outlined),
+    ShopCategory(
+      id: 'textile',
+      title: 'Tekstil mahsulotlari',
+      icon: Icons.checkroom_outlined,
+    ),
+    ShopCategory(
+      id: 'bicycles',
+      title: 'Velosipedlar',
+      icon: Icons.pedal_bike_outlined,
+    ),
+    ShopCategory(
+      id: 'beauty',
+      title: "Go'zallik",
+      icon: Icons.face_retouching_natural,
+    ),
+    ShopCategory(id: 'home', title: "Uy-ro'zg'or", icon: Icons.home_outlined),
   ];
 
   static const products = <Product>[
     Product(
       id: 'p1',
-      title: 'Smartfon Redmi A5 3+64GB Ocean blue',
+      title: 'Oppo A57 · 64 GB',
       priceUzs: 3400000,
       categoryId: 'phones',
       rating: 4.9,
@@ -52,12 +98,12 @@ class MockCatalog {
       colors: ['Ocean blue', 'Black'],
       storages: ['64 GB', '128 GB'],
       description:
-          'Redmi A5 — kundalik foydalanish uchun qulay, yengil va ishonchli smartfon.',
+          'Oppo A57 — kundalik foydalanish uchun qulay, yengil va ishonchli smartfon.',
       specs: {'Ekran': '6.7"', 'Xotira': '64 GB', 'Rang': 'Ocean blue'},
     ),
     Product(
       id: 'p2',
-      title: 'Smartfon Xiaomi Redmi 15C 4/256',
+      title: 'Realme C35 · 128 GB',
       priceUzs: 3400000,
       categoryId: 'phones',
       rating: 4.7,
@@ -68,8 +114,9 @@ class MockCatalog {
     ),
     Product(
       id: 'p3',
-      title: 'Apple iPhone 14 128GB',
+      title: 'Apple iPhone 13 Pro · 128 GB',
       priceUzs: 7800000,
+      oldPriceUzs: 8500000,
       categoryId: 'phones',
       rating: 4.9,
       reviewCount: 49,
@@ -78,7 +125,7 @@ class MockCatalog {
     ),
     Product(
       id: 'p4',
-      title: 'Samsung Galaxy A.556',
+      title: 'Samsung Galaxy S10 · 128 GB',
       priceUzs: 3000000,
       oldPriceUzs: 3500000,
       categoryId: 'phones',
@@ -86,20 +133,20 @@ class MockCatalog {
       reviewCount: 12,
       sold: 101,
       colors: ['Natural Titanium', 'Black', 'Pink'],
-      storages: ['256 GB', '512 GB', '1 TB'],
-      sellerName: 'Marketring',
+      storages: ['128 GB'],
+      sellerName: 'Avgust Market',
       description:
-          "Samsung A.556 — kuchli kamera, uzoq batareya va zamonaviy dizayn.",
+          "Samsung Galaxy S10 — kuchli kamera, uzoq batareya va zamonaviy dizayn.",
       specs: {
         'Brend': 'Samsung',
-        'Model': 'A.556',
-        'Ekran': '6.5" AMOLED',
-        'Kamera': '108 MP',
+        'Model': 'Galaxy S10',
+        'Ekran': '6.1" AMOLED',
+        'Katalog': 'Namoyish mahsuloti',
       },
     ),
     Product(
       id: 'p5',
-      title: 'Samsung Galaxy A57 256GB Lilac',
+      title: 'Vivo S1 · 128 GB',
       priceUzs: 3500000,
       categoryId: 'phones',
       rating: 4.6,
@@ -109,15 +156,16 @@ class MockCatalog {
     ),
     Product(
       id: 'p6',
-      title: 'Atir gul suvi',
+      title: 'Calvin Klein CK One',
       priceUzs: 280000,
+      oldPriceUzs: 340000,
       categoryId: 'beauty',
       rating: 4.5,
       reviewCount: 14,
     ),
     Product(
       id: 'p7',
-      title: 'Ulgurji oq idish to\'plami',
+      title: 'Alyuminiy finjon',
       priceUzs: 120000,
       categoryId: 'home',
       wholesale: true,
@@ -125,7 +173,7 @@ class MockCatalog {
     ),
     Product(
       id: 'p8',
-      title: 'Ulgurji quti (10 dona)',
+      title: 'Bambuk oshxona kurakchasi',
       priceUzs: 89000,
       categoryId: 'home',
       wholesale: true,

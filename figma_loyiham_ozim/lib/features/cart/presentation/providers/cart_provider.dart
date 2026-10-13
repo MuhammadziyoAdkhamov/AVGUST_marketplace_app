@@ -7,7 +7,12 @@ class CartNotifier extends Notifier<List<CartItem>> {
   List<CartItem> build() => [];
 
   void add(Product product, {String? color, String? storage}) {
-    final i = state.indexWhere((e) => e.product.id == product.id);
+    final i = state.indexWhere(
+      (item) =>
+          item.product.id == product.id &&
+          item.color == color &&
+          item.storage == storage,
+    );
     if (i >= 0) {
       final copy = [...state];
       copy[i] = copy[i].copyWith(qty: copy[i].qty + 1);
@@ -20,19 +25,19 @@ class CartNotifier extends Notifier<List<CartItem>> {
     ];
   }
 
-  void setQty(String productId, int qty) {
+  void setQty(String itemKey, int qty) {
     if (qty <= 0) {
-      remove(productId);
+      remove(itemKey);
       return;
     }
     state = [
       for (final item in state)
-        if (item.product.id == productId) item.copyWith(qty: qty) else item,
+        if (item.key == itemKey) item.copyWith(qty: qty) else item,
     ];
   }
 
-  void remove(String productId) {
-    state = state.where((e) => e.product.id != productId).toList();
+  void remove(String itemKey) {
+    state = state.where((item) => item.key != itemKey).toList();
   }
 
   void clear() => state = [];

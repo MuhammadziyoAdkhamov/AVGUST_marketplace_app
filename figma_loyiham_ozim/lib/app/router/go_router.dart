@@ -1,3 +1,4 @@
+import '../../features/promotions/presentation/screens/promotions_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import '../../features/catalog/presentation/screens/catalog_screen.dart';
 import '../../features/catalog/presentation/screens/product_detail_screen.dart';
 import '../../features/catalog/presentation/screens/product_video_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
+import '../../features/home/presentation/screens/all_categories_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -76,7 +78,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.promotions,
-        builder: (context, state) => const ComingSoonScreen(title: 'Aksiyalar'),
+        builder: (context, state) => const PromotionsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.chat,
+        builder: (context, state) => const ComingSoonScreen(title: 'Xabarlar'),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -88,6 +94,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: AppRoutes.home,
                 builder: (context, state) => const HomeScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'categories',
+                    builder: (context, state) => const AllCategoriesScreen(),
+                  ),
                   GoRoute(
                     path: 'wholesale',
                     builder: (context, state) => const WholesaleScreen(),

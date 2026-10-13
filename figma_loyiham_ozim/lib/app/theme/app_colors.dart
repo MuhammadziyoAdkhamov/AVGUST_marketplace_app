@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   AppColors._();
-
-  static const brand = Color(0xFF42E86A);
-  static const brandDark = Color(0xFF19B94B);
-  static const brandSoft = Color(0xFFE4FAE8);
-  static const brandButton = Color(0xFF42E86A);
-
-  static const loginBlue = Color(0xFF5D7AF1);
-  static const loginBlueSoft = Color(0xFFEDF0FF);
-
-  static const text = Color(0xFF171717);
-  static const muted = Color(0xFF6B7280);
-  static const border = Color(0xFFE0E0E0);
-  static const surface = Color(0xFFF8F9FA);
-  static const star = Color(0xFFFBBF24);
+  static const brand = Color(0xFF21C77A);
+  static const brandDark = Color(0xFF087A4B);
+  static const brandSoft = Color(0xFFE5F6EC);
+  static const brandButton = Color(0xFF123D2B);
+  static const loginBlue = brandDark;
+  static const loginBlueSoft = brandSoft;
+  static const text = Color(0xFF192C23);
+  static const muted = Color(0xFF768179);
+  static const border = Color(0xFFE5EBE7);
+  static const surface = Color(0xFFF5F7F4);
+  static const star = Color(0xFFEAA93B);
 }

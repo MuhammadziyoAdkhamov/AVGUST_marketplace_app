@@ -1,306 +1,247 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../../app/constants/app_constants.dart';
 import '../../../../app/theme/app_colors.dart';
-import '../../../../core/widgets/brand_header.dart';
+import '../../../../core/widgets/home_header.dart';
 import '../../../../shared/data/mock_catalog.dart';
 import '../../../catalog/presentation/widgets/product_card.dart';
+import '../../../catalog/presentation/widgets/product_image.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
+  final _search = TextEditingController();
   String _query = '';
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final categories = MockCatalog.categories;
-    final recommended = MockCatalog.products.take(4).toList();
-    final wholesale = MockCatalog.products.where((p) => p.wholesale).toList();
-    final suggestions = _query.trim().isEmpty
-        ? const <String>[]
-        : MockCatalog.products
-              .where(
-                (product) => product.title.toLowerCase().contains(
-                  _query.trim().toLowerCase(),
-                ),
-              )
-              .map((product) => product.title)
-              .take(4)
-              .toList();
-
+    final results = [
+      ...MockCatalog.products
+          .where((p) => p.title.toLowerCase().contains(_query.toLowerCase()))
+          .map((p) => (p.title, AppRoutes.product(p.id))),
+      ...MockCatalog.categories
+          .where((c) => c.title.toLowerCase().contains(_query.toLowerCase()))
+          .map((c) => (c.title, '${AppRoutes.catalog}?category=${c.id}')),
+    ];
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
-          children: [
-            const BrandHeader(),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Icon(Icons.menu, size: 20),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: HomeHeader(
+                controller: _search,
+                onChanged: (value) => setState(() => _query = value),
+                onSubmitted: (_) => context.go(
+                  '${AppRoutes.catalog}?${Uri(queryParameters: {'query': _query.trim()}).query}',
                 ),
-                Expanded(
-                  child: TextField(
-                    onChanged: (value) => setState(() => _query = value),
-                    onSubmitted: (_) => context.go(AppRoutes.catalog),
-                    decoration: const InputDecoration(
-                      hintText: 'Search',
-                      prefixIcon: Icon(Icons.search, size: 18),
-                      suffixIcon: Icon(Icons.person_outline, size: 18),
-                      isDense: true,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-            if (suggestions.isNotEmpty)
-              Container(
-                margin: const EdgeInsets.only(left: 28, top: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColors.border),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x12000000),
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    for (final suggestion in suggestions)
-                      ListTile(
-                        dense: true,
-                        visualDensity: VisualDensity.compact,
-                        title: Text(
-                          suggestion,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        onTap: () => context.go(AppRoutes.catalog),
-                      ),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 12),
-            Container(
-              height: 128,
-              width: double.infinity,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [Color(0xffe9a8df), Color(0xffffc35a)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverList.list(
                 children: [
-                  Positioned(
-                    right: -18,
-                    top: -38,
-                    child: Container(
-                      width: 150,
-                      height: 150,
-                      decoration: const BoxDecoration(
-                        color: Color(0x33FFFFFF),
-                        shape: BoxShape.circle,
+                  if (_query.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        children: results.isEmpty
+                            ? [
+                                const ListTile(
+                                  title: Text('Mos mahsulot topilmadi'),
+                                ),
+                              ]
+                            : results
+                                  .take(5)
+                                  .map(
+                                    (r) => ListTile(
+                                      leading: const Icon(
+                                        Icons.search,
+                                        size: 20,
+                                      ),
+                                      title: Text(r.$1),
+                                      trailing: const Icon(
+                                        Icons.north_west,
+                                        size: 16,
+                                      ),
+                                      onTap: () => context.push(r.$2),
+                                    ),
+                                  )
+                                  .toList(),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 120, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          MockCatalog.banner.title,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            color: Color(0xff5144bd),
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        Text(
-                          MockCatalog.banner.subtitle,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          height: 28,
-                          child: OutlinedButton(
-                            onPressed: () => context.go(AppRoutes.catalog),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white),
-                            ),
-                            child: Text(
-                              MockCatalog.banner.cta,
-                              style: const TextStyle(fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Positioned(
-                    right: 18,
-                    bottom: 12,
-                    child: Icon(
-                      Icons.shopping_bag_outlined,
-                      size: 76,
-                      color: Color(0xCCFFFFFF),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Categorylar',
-              style: TextStyle(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 5,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 8,
-              childAspectRatio: 0.78,
-              children: categories.map((item) {
-                return InkWell(
-                  onTap: () =>
-                      context.go('${AppRoutes.catalog}?category=${item.id}'),
-                  child: Column(
+                  const SizedBox(height: 22),
+                  const _HeroOffer(),
+                  const SizedBox(height: 14),
+                  Row(
                     children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: const Color(0xfff2f5f3),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          item.icon,
-                          color: const Color(0xff707b73),
-                          size: 26,
+                      Expanded(
+                        child: _QuickLink(
+                          icon: Icons.local_offer_outlined,
+                          label: 'Aksiyalar',
+                          color: const Color(0xFFF0E6D4),
+                          onTap: () => context.push(AppRoutes.promotions),
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        item.title,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 9),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _QuickLink(
+                          icon: Icons.inventory_2_outlined,
+                          label: 'Ulgurji xarid',
+                          color: AppColors.brandSoft,
+                          onTap: () => context.push(AppRoutes.wholesale),
+                        ),
                       ),
                     ],
                   ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                const Text(
-                  'Ulgurji mahsulotlar',
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () => context.push(AppRoutes.wholesale),
-                  child: const Text(
-                    'Barchasi >',
-                    style: TextStyle(fontSize: 11),
+                  const SizedBox(height: 22),
+                  _SectionTitle(
+                    title: 'Kategoriyalar',
+                    onTap: () => context.push(AppRoutes.allCategories),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 168,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: wholesale.isEmpty ? 2 : wholesale.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 9),
-                itemBuilder: (_, index) {
-                  if (wholesale.isEmpty) {
-                    return const SizedBox(width: 105);
-                  }
-                  return SizedBox(
-                    width: 140,
-                    child: ProductCard(product: wholesale[index]),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Tavsiya etilgan mahsulotlar',
-              style: TextStyle(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 220,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: recommended.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 9),
-                itemBuilder: (_, index) => SizedBox(
-                  width: 160,
-                  child: ProductCard(product: recommended[index]),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.brandSoft,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Xiaomi mahsulotlariga',
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          '20% chegirma',
-                          style: TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                      ],
+                  const SizedBox(height: 12),
+                  LayoutBuilder(
+                    builder: (context, constraints) => Wrap(
+                      spacing: 8,
+                      runSpacing: 14,
+                      children: MockCatalog.categories
+                          .take(10)
+                          .map(
+                            (c) => SizedBox(
+                              width: (constraints.maxWidth - 32) / 5,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () => context.go(
+                                  '${AppRoutes.catalog}?category=${c.id}',
+                                ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 56,
+                                      width: 56,
+                                      decoration: BoxDecoration(
+                                        color: c.id == 'all'
+                                            ? AppColors.brandButton
+                                            : Colors.white,
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                      child: Icon(
+                                        c.icon,
+                                        color: c.id == 'all'
+                                            ? Colors.white
+                                            : AppColors.brandDark,
+                                        size: 26,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 7),
+                                    Text(
+                                      c.title,
+                                      maxLines: 2,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        height: 1.25,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
                   ),
-                  FilledButton(
-                    onPressed: () => context.go(AppRoutes.catalog),
-                    child: const Text('Ko\'rish'),
+                  const SizedBox(height: 26),
+                  _SectionTitle(
+                    title: 'Siz uchun tanladik',
+                    onTap: () => context.go(AppRoutes.catalog),
                   ),
+                  const SizedBox(height: 12),
                 ],
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverLayoutBuilder(
+                builder: (context, constraints) => SliverGrid.builder(
+                  itemCount: 6,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: constraints.crossAxisExtent > 600 ? 4 : 2,
+                    mainAxisExtent: 286,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemBuilder: (context, index) =>
+                      ProductCard(product: MockCatalog.products[index]),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EDE4),
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.storefront_outlined,
+                      size: 36,
+                      color: AppColors.brandDark,
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Biznes uchun ham qulay',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Ulgurji mahsulotlarni kashf eting.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.muted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Ulgurji mahsulotlar',
+                      onPressed: () => context.push(AppRoutes.wholesale),
+                      icon: const Icon(Icons.arrow_forward),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Text(
+                  'Namoyish katalogi · Narxlar va mahsulotlar misol tariqasida.',
+                  style: TextStyle(fontSize: 11, color: AppColors.muted),
+                ),
               ),
             ),
           ],
@@ -308,4 +249,153 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
+}
+
+class _HeroOffer extends StatelessWidget {
+  const _HeroOffer();
+  @override
+  Widget build(BuildContext context) => Container(
+    height: 205,
+    clipBehavior: Clip.antiAlias,
+    decoration: BoxDecoration(
+      color: const Color(0xFF143D2B),
+      borderRadius: BorderRadius.circular(24),
+    ),
+    child: Stack(
+      children: [
+        Positioned(
+          right: -28,
+          top: -35,
+          child: Container(
+            width: 205,
+            height: 255,
+            decoration: const BoxDecoration(
+              color: Color(0xFF284F38),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        Positioned(
+          right: -6,
+          bottom: 8,
+          width: 145,
+          height: 178,
+          child: Transform.rotate(
+            angle: .12,
+            child: ProductImage(product: MockCatalog.products[3]),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'AVGUST TANLOVI',
+                style: TextStyle(
+                  color: Color(0xFFBDEDA3),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.8,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Yangi telefon.\nYangi imkoniyatlar.',
+                style: TextStyle(
+                  fontSize: 20,
+                  height: 1.12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -.5,
+                ),
+              ),
+              const Spacer(),
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFD6EDA7),
+                  foregroundColor: AppColors.text,
+                  minimumSize: const Size(0, 38),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                ),
+                onPressed: () =>
+                    context.go('${AppRoutes.catalog}?category=phones'),
+                label: const Text(
+                  'Ko‘rib chiqish',
+                  style: TextStyle(fontSize: 12),
+                ),
+                icon: const Icon(Icons.arrow_forward, size: 16),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _QuickLink extends StatelessWidget {
+  const _QuickLink({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Material(
+    color: color,
+    borderRadius: BorderRadius.circular(16),
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 17),
+        child: Row(
+          children: [
+            Icon(icon, size: 22),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 11),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title, required this.onTap});
+  final String title;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -.5,
+          ),
+        ),
+      ),
+      TextButton(
+        onPressed: onTap,
+        child: const Text('Barchasi', style: TextStyle(fontSize: 12)),
+      ),
+    ],
+  );
 }

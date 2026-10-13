@@ -8,9 +8,9 @@ class Product {
     this.rating = 4.8,
     this.reviewCount = 0,
     this.sold = 0,
-    this.colors = const ['Natural Titanium'],
-    this.storages = const ['256 GB'],
-    this.sellerName = 'Marketring',
+    this.colors = const [],
+    this.storages = const [],
+    this.sellerName = 'Avgust Market',
     this.description = '',
     this.specs = const {},
     this.wholesale = false,
@@ -71,6 +71,8 @@ class CartItem {
   final int qty;
   final String? color;
   final String? storage;
+
+  String get key => '${product.id}::${color ?? ''}::${storage ?? ''}';
 
   int get lineTotal => product.priceUzs * qty;
 

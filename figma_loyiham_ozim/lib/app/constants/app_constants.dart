@@ -15,6 +15,7 @@ class AppRoutes {
 
   static const home = '/home';
   static const wholesale = '/home/wholesale';
+  static const allCategories = '/home/categories';
 
   static const catalog = '/catalog';
   static String product(String id) => '/catalog/product/$id';
@@ -30,4 +31,5 @@ class AppRoutes {
   static const help = '/help';
   static const about = '/about';
   static const notifications = '/notifications';
+  static const chat = '/chat';
 }
